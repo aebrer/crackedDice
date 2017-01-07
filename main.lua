@@ -16,7 +16,7 @@ function crackedD4Mod:spawnItem()                               -- Main function
     local pos = Isaac.GetFreeNearPosition(player.Position, 80) -- Find an empty space near the player
     
     if level:GetAbsoluteStage() == 1 and level.EnterDoor == -1 and player.FrameCount == 1 and character == lostID then                      -- Only if on the first floor and only on the first frame           
-        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD4, pos, pos, player)     -- Spawn an item pedestal with the correct item in the spot from earlier
+        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD4, pos, Vector(0,0), player)     -- Spawn an item pedestal with the correct item in the spot from earlier
     end
 end
 
