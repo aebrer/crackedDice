@@ -1,6 +1,5 @@
 local crackedD4Mod = RegisterMod("Cracked D4", 1);
 local crackedD4 = Isaac.GetItemIdByName("Cracked D4");
-local RNG = RNG();
 local game = Game();
 
 
@@ -27,6 +26,7 @@ function crackedD4Mod:reroll()
   local player = Isaac.GetPlayer(0)
   local collectibles = {}
   local other_collectibles = {}
+  local RNG = player:GetDropRNG()
   
   
   for i=1, CollectibleType.NUM_COLLECTIBLES do 
@@ -42,8 +42,6 @@ function crackedD4Mod:reroll()
   if #collectibles >= 1 then --If the player has collectibles
     
     local itemRemove = collectibles[(RNG:RandomInt(#collectibles) + 1)]
-    RNG = player:GetCollectibleRNG(itemRemove)
-    itemRemove = collectibles[(RNG:RandomInt(#collectibles) + 1)]
     local itemAdd = other_collectibles[(RNG:RandomInt(#other_collectibles) + 1)]
 
     --Isaac.DebugString("Removing item: " .. itemRemove)
