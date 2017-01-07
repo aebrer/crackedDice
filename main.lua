@@ -27,7 +27,7 @@ function crackedD4Mod:reroll()
   local player = Isaac.GetPlayer(0)
   local collectibles = {}
   local other_collectibles = {}
-  RNG:SetSeed(RNG:GetSeed(), 1)
+  
   
   for i=1, CollectibleType.NUM_COLLECTIBLES do 
     --Iterate over all collectibles to see if the player has it, as far as I know you can't get the current collectible list
@@ -42,6 +42,8 @@ function crackedD4Mod:reroll()
   if #collectibles >= 1 then --If the player has collectibles
     
     local itemRemove = collectibles[(RNG:RandomInt(#collectibles) + 1)]
+    RNG = player:GetCollectibleRNG(itemRemove)
+    itemRemove = collectibles[(RNG:RandomInt(#collectibles) + 1)]
     local itemAdd = other_collectibles[(RNG:RandomInt(#other_collectibles) + 1)]
 
     --Isaac.DebugString("Removing item: " .. itemRemove)
