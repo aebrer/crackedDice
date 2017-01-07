@@ -2,8 +2,7 @@
 <metadata>
     <name>Cracked D4</name>
     <directory>crackedD4</directory>
-    <id></id>
-    <description>Placeholder text.</description>
+    <description>A cracked D4 that rerolls a single random item. Charges once per three rooms.</description>
     <version>1.0</version>
     <visibility>Public</visibility>
     <tag id="Items"/>
