@@ -1,6 +1,16 @@
 local crackedDiceMod = RegisterMod("Cracked Dice", 1);
 local game = Game();
 
+---- transformation cache function
+function crackedDiceMod:cacheUpdate(player, cacheFlag)
+  if cacheFlag == CacheFlag.CACHE_LUCK then
+    if DMTransform == true then
+      player.Luck = player.Luck + 5
+    --else 
+    --  player.Luck = player.Luck
+    end
+  end
+end
 
 
 -----------------------------
@@ -65,6 +75,8 @@ function crackedDiceMod:transform()
 
   -- at start of the game assign all the tracking variables
   if Game():GetFrameCount() ==  1 then
+    
+    player:AddCacheFlags(CacheFlag.CACHE_LUCK)
     -- our mod
     crackedD4Collected = false
 
@@ -87,7 +99,7 @@ function crackedDiceMod:transform()
     DMTransform = false
     
     -- debug
-    --Isaac.Spawn(5, 100, d1, Vector(200, 200), Vector(0,0), player)
+    --Isaac.Spawn(5, 100, d100, Vector(200, 200), Vector(0,0), player)
     --Isaac.Spawn(5, 100, d20, Vector(300, 200), Vector(0,0), player)
     --Isaac.Spawn(5, 100, d8, Vector(400, 200), Vector(0,0), player)
   
@@ -185,15 +197,15 @@ function crackedDiceMod:transform()
  
  
  -- 		     Transform!
-	if diceCollected >= 3 and DMTransform == false then
-		--player:AddNullCostume(DMCostume, - 1)
-    --Isaac.RenderText("DUNGEON MASTER!", 300.0, 200.0, 255.0, 255.0, 255.0, 1.0)
-		player:AnimateHappy()
-		player.Luck = player.Luck + 5
-		DMTransform = true
-	end
+  if diceCollected >= 3 and DMTransform == false then
+    
+    DMTransform = true
+    player:AddCacheFlags(CacheFlag.CACHE_LUCK)
+    player:AnimateHappy()
+  end
   
   if DMTransform == true then
+    --player:AddNullCostume(DMCostume, - 1)
     player:GetEffects():AddCollectibleEffect(CollectibleType.COLLECTIBLE_MIND, true)
     level:RemoveCurse(LevelCurse.CURSE_OF_BLIND)
     level:RemoveCurse(LevelCurse.CURSE_OF_THE_LOST)
@@ -279,6 +291,8 @@ function crackedDiceMod:D4reroll()
     activeItemiIsCrackedD4(player:GetActiveItem())
         
   end
+  
+  return true
 
 end
 
@@ -289,6 +303,8 @@ end
 ------------
 -- callbacks
 ------------
-crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.transform)
+
 crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D4reroll, crackedD4);
 crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.spawnItem)
+crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.transform)
+crackedDiceMod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, crackedDiceMod.cacheUpdate );
