@@ -1,17 +1,48 @@
-local crackedD4Mod = RegisterMod("Cracked D4", 1);
-local crackedD4 = Isaac.GetItemIdByName("Cracked D4");
+local crackedDiceMod = RegisterMod("Cracked Dice", 1);
 local game = Game();
 
 
-function crackedD4Mod:spawnItem()                               -- Main function that contains all the code
 
-    local level = game:GetLevel()                               -- The level which we get from the game
-    local player = Isaac.GetPlayer(0)                           -- The player
+-----------------------------
+-- get ids for all dice items
+-----------------------------
+
+-- our mod
+local crackedD4 = Isaac.GetItemIdByName("Cracked D4");
+
+-- other mods
+--not working for some reason
+--local cursedD6 =  Isaac.GetItemIdByName("Cursed D6")
+
+-- norms
+local dinfinity = Isaac.GetItemIdByName("D infinity")
+local d1 = Isaac.GetItemIdByName("D1")
+local d10 = Isaac.GetItemIdByName("D10")
+local d12 = Isaac.GetItemIdByName("D12")
+local d100 = Isaac.GetItemIdByName("D100")
+local d20 = Isaac.GetItemIdByName("D20")
+local d4 = Isaac.GetItemIdByName("D4")
+local d6 = Isaac.GetItemIdByName("The D6")
+local d7 = Isaac.GetItemIdByName("D7")
+local d8 = Isaac.GetItemIdByName("D8")
+
+
+
+
+
+----------------------------------------
+-- spawn items for start rooms and debug
+----------------------------------------
+
+function crackedDiceMod:spawnItem()
+
+    local level = game:GetLevel()
+    local player = Isaac.GetPlayer(0)
     local character = player:GetPlayerType()
     local lostID = PlayerType.PLAYER_THELOST
     
-    Isaac.DebugString(character)
-    Isaac.DebugString(lostID)
+    --Isaac.DebugString(character)
+    --Isaac.DebugString(lostID)
     
     local pos = Isaac.GetFreeNearPosition(player.Position, 80) -- Find an empty space near the player
     
@@ -21,7 +52,165 @@ function crackedD4Mod:spawnItem()                               -- Main function
 end
 
 
-function crackedD4Mod:reroll()
+
+
+
+-------------------------
+-- check dice items for transformations
+-------------------------
+function crackedDiceMod:transform()
+  
+  local player = Isaac.GetPlayer(0)
+  local level = game:GetLevel()
+
+  -- at start of the game assign all the tracking variables
+  if Game():GetFrameCount() ==  1 then
+    -- our mod
+    crackedD4Collected = false
+
+    -- other mods
+    --cursedD6Collected =  false
+    -- norms
+    dinfinityCollected = false
+    d1Collected = false
+    d10Collected = false
+    d12Collected = false
+    d100Collected = false
+    d20Collected = false
+    d4Collected = false
+    d6Collected = false
+    d7Collected = false
+    d8Collected = false
+    
+    
+    diceCollected = 0
+    DMTransform = false
+    
+    -- debug
+    --Isaac.Spawn(5, 100, d1, Vector(200, 200), Vector(0,0), player)
+    --Isaac.Spawn(5, 100, d20, Vector(300, 200), Vector(0,0), player)
+    --Isaac.Spawn(5, 100, d8, Vector(400, 200), Vector(0,0), player)
+  
+  end
+
+  -----------------------------
+  -- check for each of the dice
+  -----------------------------
+  
+  if crackedD4Collected == false then
+    if player:HasCollectible(crackedD4) then
+        crackedD4Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  --if cursedD6Collected == false then
+  --  if player:HasCollectible(cursedD6) then
+  --      cursedD6Collected = true
+  --      diceCollected = diceCollected + 1
+  --  end
+  --end
+  
+  if dinfinityCollected == false then
+    if player:HasCollectible(dinfinity) then
+        dinfinityCollected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d1Collected == false then
+    if player:HasCollectible(d1) then
+        d1Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d10Collected == false then
+    if player:HasCollectible(d10) then
+        d10Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d12Collected == false then
+    if player:HasCollectible(d12) then
+        d12Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d100Collected == false then
+    if player:HasCollectible(d100) then
+        d100Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d20Collected == false then
+    if player:HasCollectible(d20) then
+        d20Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d4Collected == false then
+    if player:HasCollectible(d4) then
+        d4Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  
+  if d6Collected == false then
+    if player:HasCollectible(d6) then
+        d6Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d7Collected == false then
+    if player:HasCollectible(d7) then
+        d7Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if d8Collected == false then
+    if player:HasCollectible(d8) then
+        d8Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+ 
+ 
+ 
+ -- 		     Transform!
+	if diceCollected >= 3 and DMTransform == false then
+		--player:AddNullCostume(DMCostume, - 1)
+    --Isaac.RenderText("DUNGEON MASTER!", 300.0, 200.0, 255.0, 255.0, 255.0, 1.0)
+		player:AnimateHappy()
+		player.Luck = player.Luck + 5
+		DMTransform = true
+	end
+  
+  if DMTransform == true then
+    player:GetEffects():AddCollectibleEffect(CollectibleType.COLLECTIBLE_MIND, true)
+    level:RemoveCurse(LevelCurse.CURSE_OF_BLIND)
+    level:RemoveCurse(LevelCurse.CURSE_OF_THE_LOST)
+    level:RemoveCurse(LevelCurse.CURSE_OF_THE_UNKNOWN)
+    level:ApplyMapEffect()
+    level:ApplyCompassEffect()
+    level:ApplyBlueMapEffect()
+  end
+
+
+
+end
+--------------------------
+-- cracked D4 use function
+--------------------------
+
+function crackedDiceMod:D4reroll()
   
   local player = Isaac.GetPlayer(0)
   local collectibles = {}
@@ -93,5 +282,13 @@ function crackedD4Mod:reroll()
 
 end
 
-crackedD4Mod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedD4Mod.reroll, crackedD4);
-crackedD4Mod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedD4Mod.spawnItem)
+
+
+
+
+------------
+-- callbacks
+------------
+crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.transform)
+crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D4reroll, crackedD4);
+crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.spawnItem)
