@@ -91,7 +91,7 @@ function crackedDiceMod:transform()
     DMTransform = false
     
     -- debug
-    Isaac.Spawn(5, 100, d100, Vector(200, 200), Vector(0,0), player)
+    --Isaac.Spawn(5, 100, d100, Vector(200, 200), Vector(0,0), player)
     --Isaac.Spawn(5, 100, d20, Vector(300, 200), Vector(0,0), player)
     --Isaac.Spawn(5, 100, d8, Vector(400, 200), Vector(0,0), player)
   
