@@ -1,6 +1,8 @@
 local crackedDiceMod = RegisterMod("Cracked Dice", 1);
 local game = Game();
 
+
+
 ---- transformation cache function
 function crackedDiceMod:cacheUpdate(player, cacheFlag)
   if cacheFlag == CacheFlag.CACHE_LUCK then
@@ -19,10 +21,6 @@ end
 
 -- our mod
 local crackedD4 = Isaac.GetItemIdByName("Cracked D4");
-
--- other mods
---not working for some reason
---local cursedD6 =  Isaac.GetItemIdByName("Cursed D6")
 
 -- norms
 local dinfinity = Isaac.GetItemIdByName("D infinity")
@@ -51,9 +49,6 @@ function crackedDiceMod:spawnItem()
     local character = player:GetPlayerType()
     local lostID = PlayerType.PLAYER_THELOST
     
-    --Isaac.DebugString(character)
-    --Isaac.DebugString(lostID)
-    
     local pos = Isaac.GetFreeNearPosition(player.Position, 80) -- Find an empty space near the player
     
     if level:GetAbsoluteStage() == 1 and level.EnterDoor == -1 and player.FrameCount == 1 and character == lostID then                      -- Only if on the first floor and only on the first frame           
@@ -72,16 +67,13 @@ function crackedDiceMod:transform()
   
   local player = Isaac.GetPlayer(0)
   local level = game:GetLevel()
-
+  
   -- at start of the game assign all the tracking variables
-  if Game():GetFrameCount() ==  1 then
+  if level:GetAbsoluteStage() == 1 and level.EnterDoor == -1 and player.FrameCount == 1 then
     
-    player:AddCacheFlags(CacheFlag.CACHE_LUCK)
     -- our mod
     crackedD4Collected = false
 
-    -- other mods
-    --cursedD6Collected =  false
     -- norms
     dinfinityCollected = false
     d1Collected = false
@@ -99,9 +91,12 @@ function crackedDiceMod:transform()
     DMTransform = false
     
     -- debug
-    --Isaac.Spawn(5, 100, d100, Vector(200, 200), Vector(0,0), player)
+    Isaac.Spawn(5, 100, d100, Vector(200, 200), Vector(0,0), player)
     --Isaac.Spawn(5, 100, d20, Vector(300, 200), Vector(0,0), player)
     --Isaac.Spawn(5, 100, d8, Vector(400, 200), Vector(0,0), player)
+  
+    player:AddCacheFlags(CacheFlag.CACHE_LUCK)
+    player:EvaluateItems()
   
   end
 
@@ -115,13 +110,6 @@ function crackedDiceMod:transform()
         diceCollected = diceCollected + 1
     end
   end
-  
-  --if cursedD6Collected == false then
-  --  if player:HasCollectible(cursedD6) then
-  --      cursedD6Collected = true
-  --      diceCollected = diceCollected + 1
-  --  end
-  --end
   
   if dinfinityCollected == false then
     if player:HasCollectible(dinfinity) then
@@ -194,18 +182,15 @@ function crackedDiceMod:transform()
     end
   end
  
- 
- 
- -- 		     Transform!
+  -- 		     Transform!
   if diceCollected >= 3 and DMTransform == false then
-    
     DMTransform = true
     player:AddCacheFlags(CacheFlag.CACHE_LUCK)
     player:AnimateHappy()
+    player:EvaluateItems()
   end
   
   if DMTransform == true then
-    --player:AddNullCostume(DMCostume, - 1)
     player:GetEffects():AddCollectibleEffect(CollectibleType.COLLECTIBLE_MIND, true)
     level:RemoveCurse(LevelCurse.CURSE_OF_BLIND)
     level:RemoveCurse(LevelCurse.CURSE_OF_THE_LOST)
