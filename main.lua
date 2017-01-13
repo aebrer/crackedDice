@@ -1,6 +1,84 @@
 local crackedDiceMod = RegisterMod("Cracked Dice", 1);
 local game = Game();
 
+function string:split(sSeparator, nMax, bRegexp)
+	assert(sSeparator ~= '')
+	assert(nMax == nil or nMax >= 1)
+
+	local aRecord = {}
+
+	if self:len() > 0 then
+		local bPlain = not bRegexp
+		nMax = nMax or -1
+
+		local nField, nStart = 1, 1
+		local nFirst,nLast = self:find(sSeparator, nStart, bPlain)
+		while nFirst and nMax ~= 0 do
+			aRecord[nField] = self:sub(nStart, nFirst-1)
+			nField = nField+1
+			nStart = nLast+1
+			nFirst,nLast = self:find(sSeparator, nStart, bPlain)
+			nMax = nMax-1
+		end
+		aRecord[nField] = self:sub(nStart)
+	end
+
+	return aRecord
+end
+
+
+------ to do
+-- other dice
+
+
+--[[New Run--]]
+function crackedDiceMod:newRun(player)
+  
+  local level = game:GetLevel()
+  local RNG = player:GetDropRNG()
+  
+  if Isaac.HasModData(crackedDiceMod) == true then
+    
+    local loadString = Isaac.LoadModData(crackedDiceMod)
+    local loadData = string.split(loadString, "@")
+    local loadedSeed = tonumber(loadData[2])
+    local loadedDiceCollected = tonumber(loadData[1])
+    local thisSeed = RNG:GetSeed()
+    
+    Isaac.DebugString("---/n/n/n/n/n/n/n----/n/n/n/n/n/----/n")
+    Isaac.DebugString(loadedDiceCollected)
+    Isaac.DebugString(thisSeed)
+    Isaac.DebugString(loadedSeed)
+    Isaac.DebugString("---/n/n/n/n/n/n/n----/n/n/n/n/n/----/n")
+    Isaac.DebugString(tostring(thisSeed == loadedSeed))
+    
+    
+    if thisSeed == loadedSeed then
+      
+      Isaac.DebugString(tostring(loadedDiceCollected >= 3))
+      
+      diceCollected = loadedDiceCollected
+      
+      if loadedDiceCollected >= 3 then
+        DMTransform = true
+      else
+        DMTransform = false
+      end
+      
+    else
+      Isaac.RemoveModData(crackedDiceMod)
+      diceCollected = 0
+      DMTransform = false
+    end
+    
+  else
+    
+    diceCollected = 0
+    DMTransform = false
+  
+  end
+end
+
 
 
 ---- transformation cache function
@@ -21,6 +99,11 @@ end
 
 -- our mod
 local crackedD4 = Isaac.GetItemIdByName("Cracked D4");
+local crackedD6 = Isaac.GetItemIdByName("Cracked D6");
+local crackedD7 = Isaac.GetItemIdByName("Cracked D7");
+local crackedD8 = Isaac.GetItemIdByName("Cracked D8");
+local crackedD20 = Isaac.GetItemIdByName("Cracked D20");
+
 
 -- norms
 local dinfinity = Isaac.GetItemIdByName("D infinity")
@@ -52,7 +135,23 @@ function crackedDiceMod:spawnItem()
     local pos = Isaac.GetFreeNearPosition(player.Position, 80) -- Find an empty space near the player
     
     if level:GetAbsoluteStage() == 1 and level.EnterDoor == -1 and player.FrameCount == 1 and character == lostID then                      -- Only if on the first floor and only on the first frame           
-        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD4, pos, Vector(0,0), player)     -- Spawn an item pedestal with the correct item in the spot from earlier
+        --Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD4, pos, Vector(0,0), player)     -- Spawn an item pedestal with the correct item in the spot from earlier
+        
+        player:RemoveCollectible(CollectibleType.COLLECTIBLE_D4)
+        player:AddCollectible(crackedD4, 3, false)
+        
+        --debug
+        pos = Isaac.GetFreeNearPosition(player.Position, 80)
+        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD6, pos, Vector(0,0), player)
+        pos = Isaac.GetFreeNearPosition(player.Position, 80)
+        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD7, pos, Vector(0,0), player)
+        pos = Isaac.GetFreeNearPosition(player.Position, 80)
+        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD8, pos, Vector(0,0), player)
+        pos = Isaac.GetFreeNearPosition(player.Position, 80)
+        Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, crackedD20, pos, Vector(0,0), player)
+        
+        
+        
     end
 end
 
@@ -66,6 +165,7 @@ end
 function crackedDiceMod:transform()
   
   local player = Isaac.GetPlayer(0)
+  local RNG = player:GetDropRNG()
   local level = game:GetLevel()
   
   -- at start of the game assign all the tracking variables
@@ -73,6 +173,10 @@ function crackedDiceMod:transform()
     
     -- our mod
     crackedD4Collected = false
+    crackedD6Collected = false
+    crackedD7Collected = false
+    crackedD8Collected = false
+    crackedD20Collected = false
 
     -- norms
     dinfinityCollected = false
@@ -86,9 +190,9 @@ function crackedDiceMod:transform()
     d7Collected = false
     d8Collected = false
     
-    
-    diceCollected = 0
-    DMTransform = false
+    -- need to remove these when loading is working correctly
+    --diceCollected = 0
+    --DMTransform = false
     
     -- debug
     --Isaac.Spawn(5, 100, d100, Vector(200, 200), Vector(0,0), player)
@@ -103,6 +207,7 @@ function crackedDiceMod:transform()
   -----------------------------
   -- check for each of the dice
   -----------------------------
+  --- mod dice
   
   if crackedD4Collected == false then
     if player:HasCollectible(crackedD4) then
@@ -110,6 +215,36 @@ function crackedDiceMod:transform()
         diceCollected = diceCollected + 1
     end
   end
+  
+  if crackedD6Collected == false then
+    if player:HasCollectible(crackedD6) then
+        crackedD6Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if crackedD7Collected == false then
+    if player:HasCollectible(crackedD7) then
+        crackedD7Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if crackedD8Collected == false then
+    if player:HasCollectible(crackedD8) then
+        crackedD8Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+  
+  if crackedD20Collected == false then
+    if player:HasCollectible(crackedD20) then
+        crackedD20Collected = true
+        diceCollected = diceCollected + 1
+    end
+  end
+
+  --- non-mod norm dice
   
   if dinfinityCollected == false then
     if player:HasCollectible(dinfinity) then
@@ -184,10 +319,13 @@ function crackedDiceMod:transform()
  
   -- 		     Transform!
   if diceCollected >= 3 and DMTransform == false then
+    Isaac.DebugString("yes made it here")
     DMTransform = true
     player:AddCacheFlags(CacheFlag.CACHE_LUCK)
     player:AnimateHappy()
     player:EvaluateItems()
+  else
+    Isaac.SaveModData(crackedDiceMod, tostring(diceCollected) .. "@" .. tostring(RNG:GetSeed()))
   end
   
   if DMTransform == true then
@@ -198,6 +336,7 @@ function crackedDiceMod:transform()
     level:ApplyMapEffect()
     level:ApplyCompassEffect()
     level:ApplyBlueMapEffect()
+    Isaac.SaveModData(crackedDiceMod, tostring(diceCollected) .. "@" .. tostring(RNG:GetSeed()))
   end
 
 
@@ -277,8 +416,125 @@ function crackedDiceMod:D4reroll()
         
   end
   
+  player:EvaluateItems()
   return true
 
+end
+
+--------------------------
+-- cracked D6 use function
+--------------------------
+function crackedDiceMod:D6reroll()
+  -- game:GetFrameCount()
+  -- And I assume to make it do something when the frame count hits 60 seconds you can do:
+    --if Game:GetFrameCount() % 1800 then
+  -- 60 frames is one second
+  -- every 20 frames add a charge, at 120 reroll
+  -- good 75% bad 25%
+  -- if good, reroll item, start charge chain again
+    -- interrupt charge cycle if no item pedestals left
+    -- no charge if leave the room
+  -- if bad, delete item pedestal, no recharge
+  
+  function rerollFunc(entities, player, RNG, collectibles, other_collectibles)
+  
+    local startFrame = game:GetFrameCount()
+    Isaac.DebugString(startFrame)
+    
+    -- check if item pedestals remain in the room
+    local itemCheck = false
+    for i = 1, #entities do
+      if entities[i].Variant == PickupVariant.PICKUP_COLLECTIBLE then
+        itemCheck = true
+      end
+    end
+    
+    Isaac.DebugString(tostring(itemCheck))
+    if itemCheck == true then
+      
+      -- do the reroll
+      for i=1, CollectibleType.NUM_COLLECTIBLES do 
+        --Iterate over all collectibles to see if the player has it, as far as I know you can't get the current collectible list
+        if player:HasCollectible(i) then --If they have it add it to the table
+          table.insert(collectibles, i)
+        else
+          table.insert(other_collectibles, i)
+        end
+      end
+      
+      -- spawn new item
+      for i = 1, #entities do
+        if entities[i].Variant == PickupVariant.PICKUP_COLLECTIBLE then
+          local rerollChance = RNG:RandomInt(4)
+          local itemNew = other_collectibles[(RNG:RandomInt(#other_collectibles) + 1)]
+          local pedPos = entities[i].Position
+          entities[i]:Remove()
+          if rerollChance > 0 then
+            Isaac.Spawn(EntityType.ENTITY_PICKUP, PickupVariant.PICKUP_COLLECTIBLE, itemNew, pedPos, Vector(0.0, 0.0), player);
+          end
+        end
+      end
+      
+      local newEntities = Isaac.GetRoomEntities();
+      
+      --wait before rerolling
+      --local currentFrame = game:GetFrameCount()
+      --while currentFrame - startFrame < 120 do
+      --  currentFrame = game:GetFrameCount()
+      --  Isaac.DebugString(currentFrame)
+      --end
+      
+      if newEntities == entities then
+        return true
+      else
+        return rerollFunc(newEntities, player, RNG, collectibles, other_collectibles)
+      end
+      
+    else
+      -- no items left
+      return true
+    
+    end
+    
+  end
+  
+  local entities = Isaac.GetRoomEntities();
+  local player = Isaac.GetPlayer(0)
+  local RNG = player:GetDropRNG()
+  local collectibles = {}
+  local other_collectibles = {}
+  
+  
+  return rerollFunc(entities, player, RNG, collectibles, other_collectibles)
+  
+  
+  -- wait 2 sec
+  --    local currentFrame = game:GetFrameCount()
+   --   while currentFrame - startFrame < 120 do
+   --     currentFrame = game:GetFrameCount()
+   --   end
+      
+      -- go again
+
+end
+
+--------------------------
+-- cracked D7 use function
+--------------------------
+function crackedDiceMod:D7reroll()
+  -- RespawnEnemies()
+end
+
+--------------------------
+-- cracked D8 use function
+--------------------------
+function crackedDiceMod:D8reroll()
+end
+
+--------------------------
+-- cracked D20 use function
+--------------------------
+function crackedDiceMod:D20reroll()
 end
 
 
@@ -289,7 +545,12 @@ end
 -- callbacks
 ------------
 
+crackedDiceMod:AddCallback(ModCallbacks.MC_POST_PLAYER_INIT, crackedDiceMod.newRun)
 crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D4reroll, crackedD4);
+crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D6reroll, crackedD6);
+crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D7reroll, crackedD7);
+crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D8reroll, crackedD8);
+crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D20reroll, crackedD20);
 crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.spawnItem)
 crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.transform)
 crackedDiceMod:AddCallback(ModCallbacks.MC_EVALUATE_CACHE, crackedDiceMod.cacheUpdate );
