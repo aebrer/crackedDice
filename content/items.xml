@@ -1,3 +1,7 @@
 <items gfxroot="gfx/items/" version="1">
 	<active description="It still rolls" gfx="crackedD4.png" maxcharges="3" name="Cracked D4"/>
+	<active description="Roll out of control" gfx="crackedD6.png" maxcharges="6" name="Cracked D6"/>
+	<active description="High risk, high reward" gfx="crackedD7.png" maxcharges="3" name="Cracked D7"/>
+	<active description="Reroll stats?" gfx="crackedD8.png" maxcharges="4" name="Cracked D8"/>
+	<active description="Something's wrong" gfx="crackedD20.png" maxcharges="6" name="Cracked D20"/>
 </items>
