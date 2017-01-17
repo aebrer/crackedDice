@@ -4,11 +4,11 @@ local DMcostume = Isaac.GetCostumeIdByPath("gfx/characters/DMcostume.anm2")
 
 
 local timer = -1
-local d8Applied = true
-local firstTimeDamage = true
-local firstTimeSpeed = true
-local firstTimeLuck = true
-local firstTimeDelay = true
+--local d8Applied = true
+--local firstTimeDamage = true
+--local firstTimeSpeed = true
+--local firstTimeLuck = true
+--local firstTimeDelay = true
 
 -----------------------------
 -- get ids for all dice items
@@ -40,17 +40,10 @@ function crackedDiceMod:save()
   
   local player = Isaac.GetPlayer(0)
   local seed = player.DropSeed
+  --old one with d8stats 
+  --Isaac.SaveModData(crackedDiceMod,    tostring(diceCollected) .. "@" .. tostring(seed) .. "@||"  .. "damage@" .. tostring(d8Stats[CacheFlag.CACHE_DAMAGE]) .. "@speed@" .. tostring(d8Stats[CacheFlag.CACHE_SPEED]) .. "@luck@" .. tostring(d8Stats[CacheFlag.CACHE_LUCK]) .. "@delay@" .. tostring(d8Stats[CacheFlag.CACHE_FIREDELAY])     )
   
-  Isaac.SaveModData(crackedDiceMod,    tostring(diceCollected) .. "@" .. tostring(seed) .. "@||"  .. "damage@" .. tostring(d8Stats[CacheFlag.CACHE_DAMAGE]) .. "@speed@" .. tostring(d8Stats[CacheFlag.CACHE_SPEED]) .. "@luck@" .. tostring(d8Stats[CacheFlag.CACHE_LUCK]) .. "@delay@" .. tostring(d8Stats[CacheFlag.CACHE_FIREDELAY])     )
-end
-
-local d8TearDelay = 0
-
-function crackedDiceMod:updateD8TearDelay()
-    local player = Isaac.GetPlayer(0)
-    if d8TearDelay ~= 0 then
-        player.MaxFireDelay = d8TearDelay
-    end
+  Isaac.SaveModData(crackedDiceMod,    tostring(diceCollected) .. "@" .. tostring(seed))
 end
 
 
@@ -145,20 +138,20 @@ function crackedDiceMod:newRun(player)
       
       
       
-      local d8Data = string.split(loadString, "||")[2]
-      local d8StatData = string.split(d8Data, "@")
+      --local d8Data = string.split(loadString, "||")[2]
+      --local d8StatData = string.split(d8Data, "@")
       --Isaac.DebugString(d8Data)
           -- needed in scope for D8 and cache update      
       --for k,v in pairs(d8StatData) do
       --  Isaac.DebugString(v)
       --end
       
-      d8Stats = {
-          [CacheFlag.CACHE_DAMAGE] = tonumber(d8StatData[2]), 
-          [CacheFlag.CACHE_LUCK] = tonumber(d8StatData[6]), 
-          [CacheFlag.CACHE_FIREDELAY] = tonumber(d8StatData[8]), 
-          [CacheFlag.CACHE_SPEED] = tonumber(d8StatData[4])
-        }
+      --d8Stats = {
+      --    [CacheFlag.CACHE_DAMAGE] = tonumber(d8StatData[2]), 
+      --    [CacheFlag.CACHE_LUCK] = tonumber(d8StatData[6]), 
+      --    --[CacheFlag.CACHE_FIREDELAY] = tonumber(d8StatData[8]), 
+      --    [CacheFlag.CACHE_SPEED] = tonumber(d8StatData[4])
+      -- }
 
     
     else
@@ -168,12 +161,12 @@ function crackedDiceMod:newRun(player)
       DMTransform = false
       
       -- needed in scope for D8 and cache update
-      d8Stats = {
-          [CacheFlag.CACHE_DAMAGE] = 0.0, 
-          [CacheFlag.CACHE_LUCK] = 0.0, 
-          [CacheFlag.CACHE_FIREDELAY] = 0, 
-          [CacheFlag.CACHE_SPEED] = 0.0
-      }
+      --d8Stats = {
+       --   [CacheFlag.CACHE_DAMAGE] = 0.0, 
+       --   [CacheFlag.CACHE_LUCK] = 0.0, 
+       --   --[CacheFlag.CACHE_FIREDELAY] = 0, 
+       --   [CacheFlag.CACHE_SPEED] = 0.0
+      --}
 
     end
     
@@ -184,21 +177,21 @@ function crackedDiceMod:newRun(player)
     
     -- needed in scope for D8 and cache update
     
-    d8Stats = {
-        [CacheFlag.CACHE_DAMAGE] = 0.0, 
-        [CacheFlag.CACHE_LUCK] = 0.0, 
-        [CacheFlag.CACHE_FIREDELAY] = 0, 
-        [CacheFlag.CACHE_SPEED] = 0.0
-      }
+    --d8Stats = {
+    --    [CacheFlag.CACHE_DAMAGE] = 0.0, 
+    --    [CacheFlag.CACHE_LUCK] = 0.0, 
+     --   --[CacheFlag.CACHE_FIREDELAY] = 0, 
+     --   [CacheFlag.CACHE_SPEED] = 0.0
+     -- }
   
   end
 
 
 
-  firstTimeDamage = true
-  firstTimeSpeed = true
-  firstTimeLuck = true
-  firstTimeDelay = true
+  --firstTimeDamage = true
+  --firstTimeSpeed = true
+  --firstTimeLuck = true
+  --firstTimeDelay = true
   --d8Applied = false
   --player:AddCacheFlags(CacheFlag.CACHE_DAMAGE)
   --player:EvaluateItems()
@@ -217,39 +210,40 @@ end
 ---- transformation cache function
 function crackedDiceMod:cacheUpdate(player, cacheFlag)
 
-  Isaac.DebugString("---------------------yes1--------------------")
-  Isaac.DebugString(tostring(d8Applied))
-  Isaac.DebugString(cacheFlag)
+  --Isaac.DebugString("---------------------yes1--------------------")
+  --Isaac.DebugString(tostring(d8Applied))
+  --Isaac.DebugString(cacheFlag)
   
   -- cracked D8 stat changes
-  if d8Applied == false or firstTimeDamage == true or firstTimeLuck == true or firstTimeDelay == true or firstTimeSpeed == true then
-    if cacheFlag == CacheFlag.CACHE_DAMAGE then
-          Isaac.DebugString("---------------------yes3--------------------")
-          Isaac.DebugString(player.Damage)
-          player.Damage = player.Damage + d8Stats[CacheFlag.CACHE_DAMAGE]
-          Isaac.DebugString(d8Stats[CacheFlag.CACHE_DAMAGE])
-          Isaac.DebugString(player.Damage)
-          firstTimeDamage = false
-    end
+  -- deleted or firstTimeDelay == true
+  --if d8Applied == false or firstTimeDamage == true or firstTimeLuck == true or firstTimeSpeed == true then
+    --if cacheFlag == CacheFlag.CACHE_DAMAGE then
+    --      Isaac.DebugString("---------------------yes3--------------------")
+    --      Isaac.DebugString(player.Damage)
+    --      player.Damage = player.Damage + d8Stats[CacheFlag.CACHE_DAMAGE]
+    --      Isaac.DebugString(d8Stats[CacheFlag.CACHE_DAMAGE])
+    --      Isaac.DebugString(player.Damage)
+    --      firstTimeDamage = false
+    --end
     
-    if cacheFlag == CacheFlag.CACHE_LUCK then
-          player.Luck = player.Luck + d8Stats[CacheFlag.CACHE_LUCK]
-          firstTimeLuck = false
-    end
+   -- if cacheFlag == CacheFlag.CACHE_LUCK then
+   --       player.Luck = player.Luck + d8Stats[CacheFlag.CACHE_LUCK]
+   --       firstTimeLuck = false
+   -- end
     
-    if cacheFlag == CacheFlag.CACHE_FIREDELAY then
-          -- broken for now
-          --player.MaxFireDelay = player.MaxFireDelay - d8Stats[CacheFlag.CACHE_FIREDELAY]
-          d8TearDelay = player.MaxFireDelay + d8Stats[CacheFlag.CACHE_FIREDELAY]
-          firstTimeDelay = false
-    end
+    --if cacheFlag == CacheFlag.CACHE_FIREDELAY then
+    --      -- broken for now
+    --      --player.MaxFireDelay = player.MaxFireDelay - d8Stats[CacheFlag.CACHE_FIREDELAY]
+    --      d8TearDelay = player.MaxFireDelay + d8Stats[CacheFlag.CACHE_FIREDELAY]
+    --      firstTimeDelay = false
+    --end
     
-    if cacheFlag == CacheFlag.CACHE_SPEED then
-          player.MoveSpeed = player.MoveSpeed + d8Stats[CacheFlag.CACHE_SPEED]
-          firstTimeSpeed = false
-    end
+   -- if cacheFlag == CacheFlag.CACHE_SPEED then
+   --       player.MoveSpeed = player.MoveSpeed + d8Stats[CacheFlag.CACHE_SPEED]
+   --       firstTimeSpeed = false
+   -- end
         
-  end
+  --end
   
 
   
@@ -737,38 +731,80 @@ function crackedDiceMod:D8reroll()
   --local RNG = RNG()
   --RNG:SetSeed(seed, 0)
   
-  local statChoice = {
-    [0] = CacheFlag.CACHE_DAMAGE, 
-    [1] = CacheFlag.CACHE_LUCK, 
-    [2] = CacheFlag.CACHE_FIREDELAY, 
-    [3] = CacheFlag.CACHE_SPEED
-  }
-  local statVals = {
-    [CacheFlag.CACHE_DAMAGE] = 1.5, 
-    [CacheFlag.CACHE_LUCK] = 1.0, 
-    [CacheFlag.CACHE_FIREDELAY] = -1, 
-    [CacheFlag.CACHE_SPEED] = 0.2
-  }
+  --local statChoice = {
+  --  [0] = CacheFlag.CACHE_DAMAGE, 
+  --  [1] = CacheFlag.CACHE_LUCK, 
+    --[3] = CacheFlag.CACHE_FIREDELAY, 
+  --  [2] = CacheFlag.CACHE_SPEED
+  --}
+  --local statVals = {
+  --  [CacheFlag.CACHE_DAMAGE] = 1.5, 
+   -- [CacheFlag.CACHE_LUCK] = 1.0, 
+    --[CacheFlag.CACHE_FIREDELAY] = -1, 
+   -- [CacheFlag.CACHE_SPEED] = 0.2
+ -- }
   
   local d8Direc = math.random(0,1)
   -- only three options currently becuase teardelay is bugged
-  local choiceFlag = statChoice[math.random(0,3)]
-  local d8Value = statVals[choiceFlag]
-  d8Applied = false
+  --local choiceFlag = statChoice[math.random(0,3)]
+  local pillChoice = math.random(0,3)
+  --local d8Value = statVals[choiceFlag]
+  --d8Applied = false
+  
+  Isaac.DebugString(d8Direc)
+  Isaac.DebugString(pillChoice)
+  
+  
+  -- PillEffect.PILLEFFECT_HEALTH_DOWN 
+  -- PILLEFFECT_HEALTH_UP
+  
+  -- PILLEFFECT_RANGE_DOWN 
+  -- PILLEFFECT_RANGE_UP 0
+  
+  -- PILLEFFECT_SPEED_DOWN 
+  -- PILLEFFECT_SPEED_UP 1
+  
+  -- PILLEFFECT_TEARS_DOWN 
+  -- PILLEFFECT_TEARS_UP 2
+  
+  -- PILLEFFECT_LUCK_DOWN 
+  -- PILLEFFECT_LUCK_UP 3
   
 
   if d8Direc == 0 then
     player:AnimateHappy()
-    d8Stats[choiceFlag] = d8Stats[choiceFlag] + d8Value
-    player:AddCacheFlags(choiceFlag)
-    player:EvaluateItems()
-    d8Applied = true
+    
+    if pillChoice == 0 then
+      player:UsePill(PillEffect.PILLEFFECT_RANGE_UP, PillColor.PILL_NULL)
+    elseif pillChoice == 1 then
+      player:UsePill(PillEffect.PILLEFFECT_SPEED_UP, PillColor.PILL_NULL)
+    elseif pillChoice == 2 then
+       player:UsePill(PillEffect.PILLEFFECT_TEARS_UP, PillColor.PILL_NULL)
+    elseif pillChoice == 3 then
+      player:UsePill(PillEffect.PILLEFFECT_LUCK_UP, PillColor.PILL_NULL)
+    end
+    
+    --d8Stats[choiceFlag] = d8Stats[choiceFlag] + d8Value
+    --player:AddCacheFlags(choiceFlag)
+    --player:EvaluateItems()
+    --d8Applied = true
   else
     player:AnimateSad()
-    d8Stats[choiceFlag] = d8Stats[choiceFlag] - d8Value
-    player:AddCacheFlags(choiceFlag)
-    player:EvaluateItems()
-    d8Applied = true
+    
+    if pillChoice == 0 then
+      player:UsePill(PillEffect.PILLEFFECT_RANGE_DOWN, PillColor.PILL_NULL)
+    elseif pillChoice == 1 then
+      player:UsePill(PillEffect.PILLEFFECT_SPEED_DOWN, PillColor.PILL_NULL)
+    elseif pillChoice == 2 then
+       player:UsePill(PillEffect.PILLEFFECT_TEARS_DOWN, PillColor.PILL_NULL)
+    elseif pillChoice == 3 then
+      player:UsePill(PillEffect.PILLEFFECT_LUCK_DOWN, PillColor.PILL_NULL)
+    end
+    
+    --d8Stats[choiceFlag] = d8Stats[choiceFlag] - d8Value
+    --player:AddCacheFlags(choiceFlag)
+    --player:EvaluateItems()
+    --d8Applied = true
   end
 
   return true
@@ -888,7 +924,6 @@ crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D6reroll, cr
 crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.timer)
 crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D7reroll, crackedD7);
 crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D8reroll, crackedD8);
-crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.updateD8TearDelay)
 crackedDiceMod:AddCallback(ModCallbacks.MC_USE_ITEM, crackedDiceMod.D20reroll, crackedD20);
 crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.spawnItem)
 crackedDiceMod:AddCallback(ModCallbacks.MC_POST_UPDATE, crackedDiceMod.transform)
