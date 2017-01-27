@@ -664,7 +664,7 @@ function crackedDiceMod:D7reroll()
   local room = game:GetRoom()
   --local seed = room:GetSpawnSeed()
   
-  if room:IsClear() then
+  if room:IsClear() and room:GetType() ~= RoomType.ROOM_BOSS then
     
     room:RespawnEnemies()
     room:SetAmbushDone(false)
